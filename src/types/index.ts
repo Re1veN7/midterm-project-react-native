@@ -7,7 +7,7 @@ export interface Job {
   description?: string;
   type?: string;
   // Note: We'll accept any other properties the API might return
-  [key: string]: any; 
+  [key: string]: any;
 }
 
 export interface ApplicationData {
