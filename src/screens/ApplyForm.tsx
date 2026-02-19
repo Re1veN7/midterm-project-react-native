@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
-import { useJobStore } from '../store/useJobStore';
-import FormInput from '../components/FormInput';
-import { isValidEmail, isValidContactNumber } from '../utils/validation';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { useJobStore } from "../store/useJobStore";
+import FormInput from "../components/FormInput";
+import { isValidEmail, isValidContactNumber } from "../utils/validation";
 
-type ApplyFormRouteProp = RouteProp<RootStackParamList, 'ApplyForm'>;
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ApplyForm'>;
+type ApplyFormRouteProp = RouteProp<RootStackParamList, "ApplyForm">;
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ApplyForm"
+>;
 
 export default function ApplyForm() {
   const route = useRoute<ApplyFormRouteProp>();
@@ -17,32 +28,37 @@ export default function ApplyForm() {
   const { isDarkMode } = useJobStore();
 
   // Form State
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [contact, setContact] = useState('');
-  const [whyHireYou, setWhyHireYou] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
+  const [whyHireYou, setWhyHireYou] = useState("");
 
   // Error State
-  const [errors, setErrors] = useState({ name: '', email: '', contact: '', whyHireYou: '' });
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    contact: "",
+    whyHireYou: "",
+  });
 
   const validateForm = () => {
     let valid = true;
-    let newErrors = { name: '', email: '', contact: '', whyHireYou: '' };
+    let newErrors = { name: "", email: "", contact: "", whyHireYou: "" };
 
     if (!name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
       valid = false;
     }
     if (!email.trim() || !isValidEmail(email)) {
-      newErrors.email = 'Valid email is required';
+      newErrors.email = "Valid email is required";
       valid = false;
     }
     if (!contact.trim() || !isValidContactNumber(contact)) {
-      newErrors.contact = 'Valid 10-11 digit contact number is required';
+      newErrors.contact = "Valid 10-11 digit contact number is required";
       valid = false;
     }
     if (!whyHireYou.trim()) {
-      newErrors.whyHireYou = 'This field is required';
+      newErrors.whyHireYou = "This field is required";
       valid = false;
     }
 
@@ -60,34 +76,38 @@ export default function ApplyForm() {
             text: "Okay",
             onPress: () => {
               // Clear form
-              setName('');
-              setEmail('');
-              setContact('');
-              setWhyHireYou('');
-              
+              setName("");
+              setEmail("");
+              setContact("");
+              setWhyHireYou("");
+
               // Redirect logic
-              if (fromScreen === 'SavedJobs') {
-                navigation.navigate('JobFinder');
+              if (fromScreen === "SavedJobs") {
+                navigation.navigate("JobFinder");
               } else {
                 navigation.goBack();
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       );
     }
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className={`flex-1 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}
     >
       <ScrollView contentContainerStyle={{ padding: 20 }}>
-        <Text className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+        <Text
+          className={`text-2xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}
+        >
           Apply for {job.title}
         </Text>
-        <Text className={`text-lg mb-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+        <Text
+          className={`text-lg mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
+        >
           {job.company}
         </Text>
 
@@ -128,7 +148,7 @@ export default function ApplyForm() {
           onChangeText={setWhyHireYou}
           multiline
           numberOfLines={4}
-          style={{ height: 100, textAlignVertical: 'top' }}
+          style={{ height: 100, textAlignVertical: "top" }}
           error={errors.whyHireYou}
           isDarkMode={isDarkMode}
         />
@@ -137,7 +157,9 @@ export default function ApplyForm() {
           onPress={handleSubmit}
           className="bg-green-600 py-4 rounded-xl items-center mt-4"
         >
-          <Text className="text-white text-lg font-bold">Submit Application</Text>
+          <Text className="text-white text-lg font-bold">
+            Submit Application
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { Job } from '../types';
+import { create } from "zustand";
+import { Job } from "../types";
 
 interface JobStore {
   // State
@@ -20,21 +20,22 @@ export const useJobStore = create<JobStore>((set) => ({
   isDarkMode: false,
 
   setJobs: (jobs) => set({ jobs }),
-  
-  saveJob: (job) => 
+
+  saveJob: (job) =>
     set((state) => {
       // Requirement: Only one of each job can be added. Must not duplicate.
-      const isAlreadySaved = state.savedJobs.some((saved) => saved.id === job.id);
+      const isAlreadySaved = state.savedJobs.some(
+        (saved) => saved.id === job.id,
+      );
       if (isAlreadySaved) return state; // Do nothing if it exists
-      
+
       return { savedJobs: [...state.savedJobs, job] };
     }),
 
-  removeSavedJob: (jobId) => 
+  removeSavedJob: (jobId) =>
     set((state) => ({
       savedJobs: state.savedJobs.filter((job) => job.id !== jobId),
     })),
 
-  toggleDarkMode: () => 
-    set((state) => ({ isDarkMode: !state.isDarkMode })),
+  toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
 }));
