@@ -4,12 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import JobFinder from '../screens/JobFinder';
 import SavedJobs from '../screens/SavedJobs';
 import ApplyForm from '../screens/ApplyForm';
+import { Job } from '../types';
 
 // Define the parameter list for our stack
 export type RootStackParamList = {
     JobFinder: undefined;
     SavedJobs: undefined;
-    ApplyForm: undefined;
+    ApplyForm: { job: Job };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -26,12 +27,12 @@ export default function AppNavigator() {
                 <Stack.Screen
                     name="SavedJobs"
                     component={SavedJobs}
-                    options={{ title: 'Saved Jobs' }}
+                    options={{ title: 'My Saved Jobs' }}
                 />
                 <Stack.Screen
                     name="ApplyForm"
                     component={ApplyForm}
-                    options={{ title: 'Apply Form' }}
+                    options={{ title: 'Apply Now', presentation: 'modal' }}
                 />
             </Stack.Navigator>
         </NavigationContainer>
