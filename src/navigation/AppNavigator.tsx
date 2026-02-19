@@ -10,7 +10,7 @@ import { Job } from '../types';
 export type RootStackParamList = {
     JobFinder: undefined;
     SavedJobs: undefined;
-    ApplyForm: { job: Job };
+    ApplyForm: { job: Job; formScreen: 'JobFinder' | 'SavedJobs' };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
