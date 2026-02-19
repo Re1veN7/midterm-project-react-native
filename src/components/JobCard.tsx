@@ -6,10 +6,11 @@ import { useJobStore } from '../store/useJobStore';
 interface JobCardProps {
   job: Job;
   onApply: (job: Job) => void;
+  isSavedScreen?: boolean; // Optional prop to check which screen we are on
 }
 
-export default function JobCard({ job, onApply }: JobCardProps) {
-  const { savedJobs, saveJob } = useJobStore();
+export default function JobCard({ job, onApply, isSavedScreen = false }: JobCardProps) {
+  const { savedJobs, saveJob, removeSavedJob } = useJobStore();
   
   // Check if this specific job is already in the savedJobs array
   const isSaved = savedJobs.some((saved) => saved.id === job.id);
@@ -21,13 +22,23 @@ export default function JobCard({ job, onApply }: JobCardProps) {
       {job.salary ? <Text className="text-green-600 dark:text-green-400 mt-1 font-semibold">{job.salary}</Text> : null}
 
       <View className="flex-row justify-between mt-4">
-        <TouchableOpacity
-          onPress={() => saveJob(job)}
-          disabled={isSaved}
-          className={`flex-1 mr-2 py-2 rounded-lg items-center ${isSaved ? 'bg-gray-400' : 'bg-blue-600'}`}
-        >
-          <Text className="text-white font-bold">{isSaved ? 'Saved' : 'Save Job'}</Text>
-        </TouchableOpacity>
+        {/* Conditional rendering based on which screen is using the card */}
+        {isSavedScreen ? (
+          <TouchableOpacity
+            onPress={() => removeSavedJob(job.id)}
+            className="flex-1 mr-2 py-2 rounded-lg items-center bg-red-600"
+          >
+            <Text className="text-white font-bold">Remove Job</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => saveJob(job)}
+            disabled={isSaved}
+            className={`flex-1 mr-2 py-2 rounded-lg items-center ${isSaved ? 'bg-gray-400' : 'bg-blue-600'}`}
+          >
+            <Text className="text-white font-bold">{isSaved ? 'Saved' : 'Save Job'}</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           onPress={() => onApply(job)}
