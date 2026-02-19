@@ -16,7 +16,7 @@ export default function SavedJobs() {
   const { savedJobs, isDarkMode } = useJobStore();
 
   const handleApply = (job: Job) => {
-    navigation.navigate('ApplyForm', { job });
+    navigation.navigate('ApplyForm', { job, formScreen: 'SavedJobs' });
   };
 
   return (

@@ -37,7 +37,7 @@ export default function JobFinder() {
   });
 
   const handleApply = (job: Job) => {
-    navigation.navigate('ApplyForm', { job });
+    navigation.navigate('ApplyForm', { job, formScreen: 'JobFinder' });
   };
 
   if (loading) {
