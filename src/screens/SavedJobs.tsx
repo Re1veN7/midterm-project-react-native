@@ -40,7 +40,7 @@ export default function SavedJobs() {
         ListEmptyComponent={
           <View className="items-center justify-center mt-20 px-4">
             <Text
-              className={`text-lg text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}
+              className={`text-lg text-center ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
             >
               You haven't saved any jobs yet.
             </Text>
