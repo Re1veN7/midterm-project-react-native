@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useJobStore } from '../store/useJobStore';
 import FormInput from '../components/FormInput';
-import { isValidEmail, isValidContactNumber } from '../utils/validation';
+import { isValidEmail, isValidContactNumber, hasNumbers, isValidNameFormat } from '../utils/validation';
 
 type ApplyFormRouteProp = RouteProp<RootStackParamList, 'ApplyForm'>;
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ApplyForm'>;
@@ -14,7 +14,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ApplyForm'>
 export default function ApplyForm() {
   const route = useRoute<ApplyFormRouteProp>();
   const navigation = useNavigation<NavigationProp>();
-  const { job, formScreen } = route.params;
+  const { job, fromScreen } = route.params;
   const { isDarkMode } = useJobStore();
 
   const [name, setName] = useState('');
@@ -23,14 +23,52 @@ export default function ApplyForm() {
   const [whyHireYou, setWhyHireYou] = useState('');
   const [errors, setErrors] = useState({ name: '', email: '', contact: '', whyHireYou: '' });
 
+  // --- UPGRADED STRICT VALIDATIONS ---
   const validateForm = () => {
     let valid = true;
     let newErrors = { name: '', email: '', contact: '', whyHireYou: '' };
 
-    if (!name.trim()) { newErrors.name = 'Name is required'; valid = false; }
-    if (!email.trim() || !isValidEmail(email)) { newErrors.email = 'Valid email is required'; valid = false; }
-    if (!contact.trim() || !isValidContactNumber(contact)) { newErrors.contact = 'Valid 10-11 digit contact number is required'; valid = false; }
-    if (!whyHireYou.trim()) { newErrors.whyHireYou = 'This field is required'; valid = false; }
+    // 1. Name Validations
+    if (!name.trim()) {
+      newErrors.name = 'Full name is required';
+      valid = false;
+    } else if (name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters long';
+      valid = false;
+    } else if (hasNumbers(name)) {
+      newErrors.name = 'Name cannot contain numbers';
+      valid = false;
+    } else if (!isValidNameFormat(name)) {
+      newErrors.name = 'Name contains invalid special characters';
+      valid = false;
+    }
+
+    // 2. Email Validations
+    if (!email.trim()) {
+      newErrors.email = 'Email address is required';
+      valid = false;
+    } else if (!isValidEmail(email.trim())) {
+      newErrors.email = 'Please enter a valid email format (e.g., user@mail.com)';
+      valid = false;
+    }
+
+    // 3. Contact Number Validations
+    if (!contact.trim()) {
+      newErrors.contact = 'Contact number is required';
+      valid = false;
+    } else if (!isValidContactNumber(contact.trim())) {
+      newErrors.contact = 'Please enter a valid 10-11 digit numeric contact number';
+      valid = false;
+    }
+
+    // 4. "Why Hire You" Validations
+    if (!whyHireYou.trim()) {
+      newErrors.whyHireYou = 'Please tell us why we should hire you';
+      valid = false;
+    } else if (whyHireYou.trim().length < 30) {
+      newErrors.whyHireYou = `Please provide more detail (minimum 30 characters). Currently: ${whyHireYou.trim().length} characters.`;
+      valid = false;
+    }
 
     setErrors(newErrors);
     return valid;
@@ -46,7 +84,7 @@ export default function ApplyForm() {
             text: "Awesome!",
             onPress: () => {
               setName(''); setEmail(''); setContact(''); setWhyHireYou('');
-              if (formScreen === 'SavedJobs') {
+              if (fromScreen === 'SavedJobs') {
                 navigation.navigate('JobFinder');
               } else {
                 navigation.goBack();
@@ -65,7 +103,7 @@ export default function ApplyForm() {
     >
       <ScrollView contentContainerStyle={{ padding: 24 }} showsVerticalScrollIndicator={false}>
         
-        {/* --- Beautiful Header Summary Card --- */}
+        {/* Header Summary Card */}
         <View className={`mb-8 p-6 rounded-3xl border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-blue-50 border-blue-100'}`}>
           <View className="flex-row items-center mb-2">
             <Ionicons name="briefcase" size={20} color={isDarkMode ? '#60a5fa' : '#3b82f6'} />
@@ -81,14 +119,14 @@ export default function ApplyForm() {
           </Text>
         </View>
 
-        {/* --- Form Inputs --- */}
+        {/* Form Inputs */}
         <FormInput label="Full Name" placeholder="e.g. John Doe" value={name} onChangeText={setName} error={errors.name} isDarkMode={isDarkMode} />
         <FormInput label="Email Address" placeholder="e.g. john@example.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" error={errors.email} isDarkMode={isDarkMode} />
-        <FormInput label="Contact Number" placeholder="e.g. 09123456789" value={contact} onChangeText={setContact} keyboardType="numeric" error={errors.contact} isDarkMode={isDarkMode} />
+        <FormInput label="Contact Number" placeholder="e.g. 09123456789" value={contact} onChangeText={setContact} keyboardType="numeric" maxLength={11} error={errors.contact} isDarkMode={isDarkMode} />
         
         <FormInput 
           label="Why should we hire you?" 
-          placeholder="Tell us about your skills, experience, and passion..." 
+          placeholder="Tell us about your skills, experience, and passion (min 30 characters)..." 
           value={whyHireYou} 
           onChangeText={setWhyHireYou} 
           multiline 
@@ -98,7 +136,7 @@ export default function ApplyForm() {
           isDarkMode={isDarkMode} 
         />
 
-        {/* --- Submit Button --- */}
+        {/* Submit Button */}
         <TouchableOpacity 
           onPress={handleSubmit} 
           className="bg-blue-600 py-4 rounded-2xl flex-row justify-center items-center mt-6 shadow-md shadow-blue-500/30"
@@ -107,7 +145,6 @@ export default function ApplyForm() {
           <Ionicons name="paper-plane" size={20} color="#ffffff" />
         </TouchableOpacity>
         
-        {/* Spacer for bottom scrolling padding */}
         <View className="h-10" />
       </ScrollView>
     </KeyboardAvoidingView>
