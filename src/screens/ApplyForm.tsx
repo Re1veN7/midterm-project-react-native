@@ -106,7 +106,7 @@ export default function ApplyForm() {
           Apply for {job.title}
         </Text>
         <Text
-          className={`text-lg mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
+          className={`text-lg mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}
         >
           {job.company}
         </Text>
