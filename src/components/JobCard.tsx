@@ -1,75 +1,112 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { Job } from "../types";
-import { useJobStore } from "../store/useJobStore";
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Job } from '../types';
+import { useJobStore } from '../store/useJobStore';
 
 interface JobCardProps {
   job: Job;
   onApply: (job: Job) => void;
-  isSavedScreen?: boolean; // Optional prop to check which screen we are on
+  isSavedScreen?: boolean;
 }
 
-export default function JobCard({
-  job,
-  onApply,
-  isSavedScreen = false,
-}: JobCardProps) {
+export default function JobCard({ job, onApply, isSavedScreen = false }: JobCardProps) {
   const { savedJobs, saveJob, removeSavedJob, isDarkMode } = useJobStore();
-
-  // Check if this specific job is already in the savedJobs array
   const isSaved = savedJobs.some((saved) => saved.id === job.id);
 
   return (
-    <View
-      className={`p-4 m-2 mx-4 rounded-xl shadow-sm border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
-    >
-      <Text
-        className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}
-      >
-        {job.title || "Untitled Job"}
-      </Text>
-
-      <Text
-        className={`mt-1 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}
-      >
-        {job.company || "Unknown Company"}
-      </Text>
-
-      {job.salary ? (
-        <Text
-          className={`mt-1 font-semibold ${isDarkMode ? "text-green-400" : "text-green-600"}`}
+    <View className={`p-5 m-2 mx-4 rounded-2xl shadow-sm border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+      
+      {/* --- Top Row: Job Title --- */}
+      <View className="flex-row justify-between items-start mb-3">
+        <Text 
+          className={`flex-1 text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`} 
+          numberOfLines={2}
         >
-          {job.salary}
+          {job.title || 'Untitled Job'}
         </Text>
-      ) : null}
+      </View>
 
-      <View className="flex-row justify-between mt-4">
+      {/* --- Middle Row: Icons + Details --- */}
+      <View className="mb-5">
+        {/* Company Info */}
+        <View className="flex-row items-center mb-2">
+          <Ionicons name="business-outline" size={16} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
+          <Text className={`ml-2 text-base ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            {job.company || 'Unknown Company'}
+          </Text>
+        </View>
+
+        {/* Dynamic Location & Salary Row */}
+        <View className="flex-row items-center mt-1">
+          {job.location ? (
+            <View className="flex-row items-center mr-4">
+              <Ionicons name="location-outline" size={16} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
+              <Text className={`ml-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                {job.location}
+              </Text>
+            </View>
+          ) : null}
+
+          {job.salary ? (
+            <View className="flex-row items-center">
+              <Ionicons name="cash-outline" size={16} color={isDarkMode ? '#34d399' : '#059669'} />
+              <Text className={`ml-1 font-semibold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                {job.salary}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      </View>
+
+      {/* --- Bottom Row: Action Buttons --- */}
+      {/* We add a subtle divider line above the buttons */}
+      <View 
+        className="flex-row justify-between pt-4 border-t" 
+        style={{ borderTopColor: isDarkMode ? '#374151' : '#f3f4f6' }}
+      >
         {isSavedScreen ? (
           <TouchableOpacity
             onPress={() => removeSavedJob(job.id)}
-            className="flex-1 mr-2 py-2 rounded-lg items-center bg-red-600"
+            className={`flex-1 mr-2 py-3 rounded-xl flex-row items-center justify-center ${isDarkMode ? 'bg-red-900/20' : 'bg-red-50'}`}
           >
-            <Text className="text-white font-bold">Remove Job</Text>
+            <Ionicons name="trash-outline" size={18} color={isDarkMode ? '#f87171' : '#dc2626'} />
+            <Text className={`ml-2 font-bold ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>Remove</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             onPress={() => saveJob(job)}
             disabled={isSaved}
-            className={`flex-1 mr-2 py-2 rounded-lg items-center ${isSaved ? "bg-gray-400" : "bg-blue-600"}`}
+            className={`flex-1 mr-2 py-3 rounded-xl flex-row items-center justify-center border ${
+              isSaved 
+                ? isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200' 
+                : isDarkMode ? 'bg-transparent border-blue-500' : 'bg-transparent border-blue-500'
+            }`}
           >
-            <Text className="text-white font-bold">
-              {isSaved ? "Saved" : "Save Job"}
+            <Ionicons 
+              name={isSaved ? "bookmark" : "bookmark-outline"} 
+              size={18} 
+              color={isSaved ? (isDarkMode ? '#9ca3af' : '#6b7280') : '#3b82f6'} 
+            />
+            <Text className={`ml-2 font-bold ${
+              isSaved 
+                ? isDarkMode ? 'text-gray-400' : 'text-gray-500' 
+                : 'text-blue-500'
+            }`}>
+              {isSaved ? 'Saved' : 'Save'}
             </Text>
           </TouchableOpacity>
         )}
 
         <TouchableOpacity
           onPress={() => onApply(job)}
-          className="flex-1 ml-2 py-2 rounded-lg items-center bg-green-600"
+          className="flex-1 ml-2 py-3 rounded-xl flex-row items-center justify-center bg-blue-600 shadow-sm"
         >
-          <Text className="text-white font-bold">Apply</Text>
+          <Text className="text-white font-bold mr-2">Apply Now</Text>
+          <Ionicons name="arrow-forward" size={18} color="#ffffff" />
         </TouchableOpacity>
       </View>
+
     </View>
   );
 }
