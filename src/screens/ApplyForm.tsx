@@ -1,66 +1,36 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigation/AppNavigator";
-import { useJobStore } from "../store/useJobStore";
-import FormInput from "../components/FormInput";
-import { isValidEmail, isValidContactNumber } from "../utils/validation";
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import { useJobStore } from '../store/useJobStore';
+import FormInput from '../components/FormInput';
+import { isValidEmail, isValidContactNumber } from '../utils/validation';
 
-type ApplyFormRouteProp = RouteProp<RootStackParamList, "ApplyForm">;
-type NavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "ApplyForm"
->;
+type ApplyFormRouteProp = RouteProp<RootStackParamList, 'ApplyForm'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'ApplyForm'>;
 
 export default function ApplyForm() {
   const route = useRoute<ApplyFormRouteProp>();
   const navigation = useNavigation<NavigationProp>();
-  const { job, fromScreen } = route.params;
+  const { job, formScreen } = route.params;
   const { isDarkMode } = useJobStore();
 
-  // Form State
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [contact, setContact] = useState("");
-  const [whyHireYou, setWhyHireYou] = useState("");
-
-  // Error State
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    contact: "",
-    whyHireYou: "",
-  });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [contact, setContact] = useState('');
+  const [whyHireYou, setWhyHireYou] = useState('');
+  const [errors, setErrors] = useState({ name: '', email: '', contact: '', whyHireYou: '' });
 
   const validateForm = () => {
     let valid = true;
-    let newErrors = { name: "", email: "", contact: "", whyHireYou: "" };
+    let newErrors = { name: '', email: '', contact: '', whyHireYou: '' };
 
-    if (!name.trim()) {
-      newErrors.name = "Name is required";
-      valid = false;
-    }
-    if (!email.trim() || !isValidEmail(email)) {
-      newErrors.email = "Valid email is required";
-      valid = false;
-    }
-    if (!contact.trim() || !isValidContactNumber(contact)) {
-      newErrors.contact = "Valid 10-11 digit contact number is required";
-      valid = false;
-    }
-    if (!whyHireYou.trim()) {
-      newErrors.whyHireYou = "This field is required";
-      valid = false;
-    }
+    if (!name.trim()) { newErrors.name = 'Name is required'; valid = false; }
+    if (!email.trim() || !isValidEmail(email)) { newErrors.email = 'Valid email is required'; valid = false; }
+    if (!contact.trim() || !isValidContactNumber(contact)) { newErrors.contact = 'Valid 10-11 digit contact number is required'; valid = false; }
+    if (!whyHireYou.trim()) { newErrors.whyHireYou = 'This field is required'; valid = false; }
 
     setErrors(newErrors);
     return valid;
@@ -69,98 +39,76 @@ export default function ApplyForm() {
   const handleSubmit = () => {
     if (validateForm()) {
       Alert.alert(
-        "Application Successful!",
-        `You have successfully applied for the ${job.title} position at ${job.company}.`,
+        "Application Sent! 🎉",
+        `Your application for ${job.title} at ${job.company} has been successfully submitted.`,
         [
           {
-            text: "Okay",
+            text: "Awesome!",
             onPress: () => {
-              // Clear form
-              setName("");
-              setEmail("");
-              setContact("");
-              setWhyHireYou("");
-
-              // Redirect logic
-              if (fromScreen === "SavedJobs") {
-                navigation.navigate("JobFinder");
+              setName(''); setEmail(''); setContact(''); setWhyHireYou('');
+              if (formScreen === 'SavedJobs') {
+                navigation.navigate('JobFinder');
               } else {
                 navigation.goBack();
               }
-            },
-          },
-        ],
+            }
+          }
+        ]
       );
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className={`flex-1 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}
     >
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
-        <Text
-          className={`text-2xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}
-        >
-          Apply for {job.title}
-        </Text>
-        <Text
-          className={`text-lg mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}
-        >
-          {job.company}
-        </Text>
-
-        <FormInput
-          label="Full Name"
-          placeholder="John Doe"
-          value={name}
-          onChangeText={setName}
-          error={errors.name}
-          isDarkMode={isDarkMode}
-        />
-
-        <FormInput
-          label="Email Address"
-          placeholder="john@example.com"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          error={errors.email}
-          isDarkMode={isDarkMode}
-        />
-
-        <FormInput
-          label="Contact Number"
-          placeholder="09123456789"
-          value={contact}
-          onChangeText={setContact}
-          keyboardType="numeric"
-          error={errors.contact}
-          isDarkMode={isDarkMode}
-        />
-
-        <FormInput
-          label="Why should we hire you?"
-          placeholder="Tell us about your skills and experience..."
-          value={whyHireYou}
-          onChangeText={setWhyHireYou}
-          multiline
-          numberOfLines={4}
-          style={{ height: 100, textAlignVertical: "top" }}
-          error={errors.whyHireYou}
-          isDarkMode={isDarkMode}
-        />
-
-        <TouchableOpacity
-          onPress={handleSubmit}
-          className="bg-green-600 py-4 rounded-xl items-center mt-4"
-        >
-          <Text className="text-white text-lg font-bold">
-            Submit Application
+      <ScrollView contentContainerStyle={{ padding: 24 }} showsVerticalScrollIndicator={false}>
+        
+        {/* --- Beautiful Header Summary Card --- */}
+        <View className={`mb-8 p-6 rounded-3xl border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-blue-50 border-blue-100'}`}>
+          <View className="flex-row items-center mb-2">
+            <Ionicons name="briefcase" size={20} color={isDarkMode ? '#60a5fa' : '#3b82f6'} />
+            <Text className={`ml-2 text-lg font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+              Applying For
+            </Text>
+          </View>
+          <Text className={`text-2xl font-extrabold mt-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            {job.title}
           </Text>
+          <Text className={`text-base font-medium mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            at {job.company}
+          </Text>
+        </View>
+
+        {/* --- Form Inputs --- */}
+        <FormInput label="Full Name" placeholder="e.g. John Doe" value={name} onChangeText={setName} error={errors.name} isDarkMode={isDarkMode} />
+        <FormInput label="Email Address" placeholder="e.g. john@example.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" error={errors.email} isDarkMode={isDarkMode} />
+        <FormInput label="Contact Number" placeholder="e.g. 09123456789" value={contact} onChangeText={setContact} keyboardType="numeric" error={errors.contact} isDarkMode={isDarkMode} />
+        
+        <FormInput 
+          label="Why should we hire you?" 
+          placeholder="Tell us about your skills, experience, and passion..." 
+          value={whyHireYou} 
+          onChangeText={setWhyHireYou} 
+          multiline 
+          numberOfLines={5} 
+          style={{ height: 120, textAlignVertical: 'top' }} 
+          error={errors.whyHireYou} 
+          isDarkMode={isDarkMode} 
+        />
+
+        {/* --- Submit Button --- */}
+        <TouchableOpacity 
+          onPress={handleSubmit} 
+          className="bg-blue-600 py-4 rounded-2xl flex-row justify-center items-center mt-6 shadow-md shadow-blue-500/30"
+        >
+          <Text className="text-white text-lg font-bold mr-2">Submit Application</Text>
+          <Ionicons name="paper-plane" size={20} color="#ffffff" />
         </TouchableOpacity>
+        
+        {/* Spacer for bottom scrolling padding */}
+        <View className="h-10" />
       </ScrollView>
     </KeyboardAvoidingView>
   );
