@@ -65,7 +65,7 @@ export default function SavedJobs() {
 
             {/* Quick action button to go back to searching */}
             <TouchableOpacity
-              onPress={() => navigation.navigate('JobFinder')}
+              onPress={() => navigation.popToTop()} // CHANGED TO PREVENT PAGE STACKING
               className="mt-8 bg-blue-600 px-6 py-4 rounded-2xl flex-row items-center shadow-md shadow-blue-500/30"
             >
               <Ionicons name="search" size={20} color="#fff" />
