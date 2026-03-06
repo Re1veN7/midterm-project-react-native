@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { Job } from '../types';
+import { create } from "zustand";
+import { Job } from "../types";
 
 interface JobStore {
   jobs: Job[];
@@ -21,15 +21,17 @@ export const useJobStore = create<JobStore>((set) => ({
   isDarkMode: false,
 
   setJobs: (jobs) => set({ jobs }),
-  
-  saveJob: (job) => 
+
+  saveJob: (job) =>
     set((state) => {
-      const isAlreadySaved = state.savedJobs.some((saved) => saved.id === job.id);
+      const isAlreadySaved = state.savedJobs.some(
+        (saved) => saved.id === job.id,
+      );
       if (isAlreadySaved) return state;
       return { savedJobs: [...state.savedJobs, job] };
     }),
 
-  removeSavedJob: (jobId) => 
+  removeSavedJob: (jobId) =>
     set((state) => ({
       savedJobs: state.savedJobs.filter((job) => job.id !== jobId),
     })),
@@ -41,6 +43,5 @@ export const useJobStore = create<JobStore>((set) => ({
       return { appliedJobs: [...state.appliedJobs, jobId] };
     }),
 
-  toggleDarkMode: () => 
-    set((state) => ({ isDarkMode: !state.isDarkMode })),
+  toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
 }));
