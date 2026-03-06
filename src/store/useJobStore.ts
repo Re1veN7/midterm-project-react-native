@@ -1,41 +1,46 @@
-import { create } from "zustand";
-import { Job } from "../types";
+import { create } from 'zustand';
+import { Job } from '../types';
 
 interface JobStore {
-  // State
   jobs: Job[];
   savedJobs: Job[];
+  appliedJobs: string[]; // NEW: Track IDs of jobs applied for
   isDarkMode: boolean;
 
-  // Actions
   setJobs: (jobs: Job[]) => void;
   saveJob: (job: Job) => void;
   removeSavedJob: (jobId: string) => void;
+  addAppliedJob: (jobId: string) => void; // NEW: Action to mark as applied
   toggleDarkMode: () => void;
 }
 
 export const useJobStore = create<JobStore>((set) => ({
   jobs: [],
   savedJobs: [],
+  appliedJobs: [],
   isDarkMode: false,
 
   setJobs: (jobs) => set({ jobs }),
-
-  saveJob: (job) =>
+  
+  saveJob: (job) => 
     set((state) => {
-      // Requirement: Only one of each job can be added. Must not duplicate.
-      const isAlreadySaved = state.savedJobs.some(
-        (saved) => saved.id === job.id,
-      );
-      if (isAlreadySaved) return state; // Do nothing if it exists
-
+      const isAlreadySaved = state.savedJobs.some((saved) => saved.id === job.id);
+      if (isAlreadySaved) return state;
       return { savedJobs: [...state.savedJobs, job] };
     }),
 
-  removeSavedJob: (jobId) =>
+  removeSavedJob: (jobId) => 
     set((state) => ({
       savedJobs: state.savedJobs.filter((job) => job.id !== jobId),
     })),
 
-  toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+  addAppliedJob: (jobId) =>
+    set((state) => {
+      // Prevent duplicates
+      if (state.appliedJobs.includes(jobId)) return state;
+      return { appliedJobs: [...state.appliedJobs, jobId] };
+    }),
+
+  toggleDarkMode: () => 
+    set((state) => ({ isDarkMode: !state.isDarkMode })),
 }));

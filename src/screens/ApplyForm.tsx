@@ -15,7 +15,7 @@ export default function ApplyForm() {
   const route = useRoute<ApplyFormRouteProp>();
   const navigation = useNavigation<NavigationProp>();
   const { job, fromScreen } = route.params;
-  const { isDarkMode } = useJobStore();
+  const { isDarkMode, addAppliedJob } = useJobStore();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -76,6 +76,7 @@ export default function ApplyForm() {
 
   const handleSubmit = () => {
     if (validateForm()) {
+      addAppliedJob(job.id);
       Alert.alert(
         "Application Sent! 🎉",
         `Your application for ${job.title} at ${job.company} has been successfully submitted.`,
@@ -83,12 +84,14 @@ export default function ApplyForm() {
           {
             text: "Awesome!",
             onPress: () => {
-              setName(''); setEmail(''); setContact(''); setWhyHireYou('');
-              if (fromScreen === 'SavedJobs') {
-                navigation.navigate('JobFinder');
-              } else {
-                navigation.goBack();
-              }
+              // 1. Clear the form
+              setName(''); 
+              setEmail(''); 
+              setContact(''); 
+              setWhyHireYou('');
+              
+              // 2. Simply go back to the previous screen, no matter where we came from!
+              navigation.goBack();
             }
           }
         ]
